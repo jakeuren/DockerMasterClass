@@ -1,0 +1,318 @@
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-panel: #0d0d14;
+  --border-color: #1a1a2e;
+  --border-glow: #00ff9520;
+
+  --terminal-green: #00ff95;
+  --terminal-green-dim: #00ff9540;
+  --terminal-amber: #ffb000;
+  --terminal-red: #ff3d3d;
+  --terminal-cyan: #00d4ff;
+  --terminal-purple: #bd93f9;
+
+  --text-primary: #e4e4e7;
+  --text-secondary: #71717a;
+  --text-muted: #3f3f46;
+
+  --font-display: 'Orbitron', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --scanline-opacity: 0.03;
+  --glow-strength: 0 0 20px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: var(--font-mono);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* CRT Scanline Effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, var(--scanline-opacity)),
+    rgba(0, 0, 0, var(--scanline-opacity)) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Screen flicker effect */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.9; }
+  94% { opacity: 1; }
+}
+
+body {
+  animation: flicker 8s infinite;
+}
+
+/* Background grid pattern */
+#root {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(0, 255, 149, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 149, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: -1px -1px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terminal-green-dim);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--terminal-green);
+}
+
+/* Terminal text glow */
+.glow-text {
+  text-shadow: var(--glow-strength) currentColor;
+}
+
+/* Blinking cursor effect */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 1.2em;
+  background: var(--terminal-green);
+  margin-left: 4px;
+  animation: blink 1s infinite;
+}
+
+/* Status indicator pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px currentColor;
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 16px currentColor;
+  }
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-healthy {
+  background: var(--terminal-green);
+  color: var(--terminal-green);
+}
+
+.status-unhealthy {
+  background: var(--terminal-red);
+  color: var(--terminal-red);
+}
+
+.status-unknown {
+  background: var(--terminal-amber);
+  color: var(--terminal-amber);
+}
+
+/* Button styles */
+button {
+  font-family: var(--font-mono);
+  background: transparent;
+  border: 1px solid var(--terminal-green);
+  color: var(--terminal-green);
+  padding: 10px 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--terminal-green-dim), transparent);
+  transition: left 0.4s;
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:hover {
+  background: var(--terminal-green-dim);
+  box-shadow: 0 0 20px var(--terminal-green-dim);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+button:disabled:hover::before {
+  left: -100%;
+}
+
+/* Input styles */
+input, select {
+  font-family: var(--font-mono);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: var(--terminal-green);
+  box-shadow: 0 0 10px var(--terminal-green-dim);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Panel styles */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--terminal-green-dim), transparent);
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--terminal-green);
+}
+
+.panel-body {
+  padding: 20px;
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--terminal-cyan);
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+tr:hover td {
+  background: var(--bg-secondary);
+}
+
+/* Loading animation */
+@keyframes loading {
+  0% { content: '⠋'; }
+  10% { content: '⠙'; }
+  20% { content: '⠹'; }
+  30% { content: '⠸'; }
+  40% { content: '⠼'; }
+  50% { content: '⠴'; }
+  60% { content: '⠦'; }
+  70% { content: '⠧'; }
+  80% { content: '⠇'; }
+  90% { content: '⠏'; }
+}
+
+.loading::after {
+  content: '⠋';
+  animation: loading 1s infinite;
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--terminal-green);
+}
+
+/* Typewriter effect */
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typewriter 2s steps(40) 1;
+}

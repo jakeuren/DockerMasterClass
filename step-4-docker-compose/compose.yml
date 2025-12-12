@@ -1,0 +1,63 @@
+# Microservices Demo Stack (.NET 9)
+# This demonstrates real microservices patterns:
+# - API Gateway pattern
+# - Service-to-service communication
+# - Service discovery via Docker DNS
+# - Health checks
+# - Scaling individual services
+
+services:
+  # API Gateway - Single entry point for all requests
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "9000:5000"  # Only the gateway is exposed externally
+    depends_on:
+      - users-service
+      - orders-service
+      - inventory-service
+    environment:
+      - USERS_SERVICE_URL=http://users-service:5001
+      - ORDERS_SERVICE_URL=http://orders-service:5002
+      - INVENTORY_SERVICE_URL=http://inventory-service:5003
+    networks:
+      - microservices-net
+
+  # Users Service - Manages user data
+  users-service:
+    build: ./users-service
+    networks:
+      - microservices-net
+    # Note: No ports exposed! Only accessible within the network
+
+  # Orders Service - Manages orders, calls other services
+  orders-service:
+    build: ./orders-service
+    environment:
+      - USERS_SERVICE_URL=http://users-service:5001
+      - INVENTORY_SERVICE_URL=http://inventory-service:5003
+    networks:
+      - microservices-net
+    depends_on:
+      - users-service
+      - inventory-service
+
+  # Inventory Service - Manages product inventory
+  inventory-service:
+    build: ./inventory-service
+    networks:
+      - microservices-net
+
+  # React Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge

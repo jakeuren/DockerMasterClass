@@ -1,0 +1,50 @@
+# Development Overrides
+# This file is automatically loaded with compose.yml
+# Use: docker compose up (loads compose.yml + compose.override.yml)
+
+services:
+  # Expose PostgreSQL for direct database access during development
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      # More verbose logging in development
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+
+  # Expose individual services for debugging
+  users-service:
+    ports:
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  orders-service:
+    ports:
+      - "5002:5002"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  inventory-service:
+    ports:
+      - "5003:5003"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  api-gateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  # pgAdmin for database management (dev only)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - microservices-net

@@ -1,0 +1,72 @@
+# Production Overrides
+# Use: docker compose -f compose.yml -f compose.prod.yml up
+
+services:
+  postgres:
+    # No exposed ports in production
+    environment:
+      # Strong password from environment
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # Restart policy
+    restart: unless-stopped
+
+  api-gateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+      replicas: 2
+    restart: unless-stopped
+
+  users-service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DATABASE_URL=Host=postgres;Database=microservices;Username=postgres;Password=${POSTGRES_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    restart: unless-stopped
+
+  orders-service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DATABASE_URL=Host=postgres;Database=microservices;Username=postgres;Password=${POSTGRES_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    restart: unless-stopped
+
+  inventory-service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DATABASE_URL=Host=postgres;Database=microservices;Username=postgres;Password=${POSTGRES_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    restart: unless-stopped
+
+  frontend:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+    restart: unless-stopped
